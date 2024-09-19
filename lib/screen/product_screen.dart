@@ -6,7 +6,7 @@ import '../widget/product_item.dart';
 import 'add__product.dart';
 
 class ProductListScreen extends StatefulWidget {
-  const ProductListScreen({super.key});
+  const ProductListScreen({super.key, });
 
   @override
   State<ProductListScreen> createState() => _ProductListScreenState();
@@ -15,11 +15,11 @@ class ProductListScreen extends StatefulWidget {
 class _ProductListScreenState extends State<ProductListScreen> {
   List<Product> productList = [];
   bool _inProgress = false;
-
+  late final Product product ;
   @override
   void initState() {
     super.initState();
-    getProductList(); // Load product list initially
+    getProductList();
   }
 
   @override
@@ -41,12 +41,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
         child: ListView.separated(
           itemCount: productList.length,
           itemBuilder: (context, index) {
-            return ProductItem(
-              product: productList[index],
-              onDelete: (String productId) {
-                _deleteProductFromList(productId); // Handle delete
-              },
-            );
+            return ProductItem(product: productList[index], );
           },
           separatorBuilder: (context, index) {
             return const SizedBox(height: 16);
@@ -67,7 +62,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
     );
   }
 
-  // Function to fetch product list
+  // Fetch product list
   Future<void> getProductList() async {
     setState(() {
       _inProgress = true;
@@ -104,44 +99,42 @@ class _ProductListScreenState extends State<ProductListScreen> {
     });
   }
 
-  // Function to delete a product
-  Future<void> _deleteProductFromList(String productId) async {
-    try {
-      print('Attempting to delete product with ID: $productId'); // Log product ID
-      Uri uri = Uri.parse('http://164.68.107.70:6060/api/v1/DeleteProduct/$productId');
-      Response response = await delete(uri);
+  // Future<void> _deleteProductFromList(String productId) async {
+  //   try {
+  //     print('Attempting to delete product with ID: $productId');
+  //     Uri uri = Uri.parse('http://164.68.107.70:6060/api/v1/DeleteProduct/$productId');
+  //     Response response = await delete(uri);
+  //
+  //     print('Delete Response Status: ${response.statusCode}');
+  //     print('Delete Response Body: ${response.body}');
+  //
+  //     if (response.statusCode == 200) {
+  //       final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+  //       if (jsonResponse['status'] == 'success') {
+  //         setState(() {
+  //           productList.removeWhere((product) => product.id == productId);
+  //         });
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           const SnackBar(content: Text('Product deleted successfully')),
+  //         );
+  //       } else {
+  //         print('Delete failed. Response: ${jsonResponse['message']}');
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(content: Text('Failed to delete product: ${jsonResponse['message']}')),
+  //         );
+  //       }
+  //     } else {
+  //       print('Delete failed with status code: ${response.statusCode}');
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Failed to delete product. Status code: ${response.statusCode}')),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     print('Error occurred while deleting: $e');
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Error deleting product.')),
+  //     );
+  //   }
+  // }
 
-      // Log response for debugging
-      print('Delete Response Status: ${response.statusCode}');
-      print('Delete Response Body: ${response.body}');
-
-      if (response.statusCode == 200) {
-        // Assuming a successful delete response contains "success"
-        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-        if (jsonResponse['status'] == 'success') {
-          setState(() {
-            productList.removeWhere((product) => product.id == productId);
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Product deleted successfully')),
-          );
-        } else {
-          print('Delete failed. Response: ${jsonResponse['message']}');
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to delete product: ${jsonResponse['message']}')),
-          );
-        }
-      } else {
-        print('Delete failed with status code: ${response.statusCode}');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to delete product. Status code: ${response.statusCode}')),
-        );
-      }
-    } catch (e) {
-      print('Error occurred while deleting: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error deleting product.')),
-      );
-    }
-  }
 }

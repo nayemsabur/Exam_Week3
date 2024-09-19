@@ -1,30 +1,34 @@
 import 'package:flutter/material.dart';
 import '../module/product.dart';
 import '../screen/update_product.dart';
+import 'package:http/http.dart';
 
-class ProductItem extends StatelessWidget {
+class ProductItem extends StatefulWidget {
   final Product product;
-  final Function(String productId) onDelete;
 
   const ProductItem({
     super.key,
     required this.product,
-    required this.onDelete,
   });
 
+  @override
+  State<ProductItem> createState() => _ProductItemState();
+}
+
+class _ProductItemState extends State<ProductItem> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       tileColor: Colors.white,
-      title: Text(product.productName),
+      title: Text(widget.product.productName),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Product Code: ${product.productCode}'),
-          Text('Price: \$${product.unitPrice}'),
-          Text('Quantity: ${product.quantity}'),
-          Text('Total Price: \$${product.totalPrice}'),
+          Text('Product Code: ${widget.product.productCode}'),
+          Text('Price: \$${widget.product.unitPrice}'),
+          Text('Quantity: ${widget.product.quantity}'),
+          Text('Total Price: \$${widget.product.totalPrice}'),
           const Divider(),
           ButtonBar(
             children: [
@@ -34,14 +38,14 @@ class ProductItem extends StatelessWidget {
                     context,
                     MaterialPageRoute(builder: (context) {
                       return UpdateProductScreen(
-                        productId: product.id, // Pass the product ID
+                        productId: widget.product.id,
                         productData: {
-                          'ProductName': product.productName,
-                          'ProductCode': product.productCode,
-                          'UnitPrice': product.unitPrice,
-                          'TotalPrice': product.totalPrice,
-                          'Qty': product.quantity,
-                          'Img': product.productImage, // Pass the image if applicable
+                          'ProductName': widget.product.productName,
+                          'ProductCode': widget.product.productCode,
+                          'UnitPrice': widget.product.unitPrice,
+                          'TotalPrice': widget.product.totalPrice,
+                          'Qty': widget.product.quantity,
+                          'Img': widget.product.productImage,
                         },
                       );
                     }),
@@ -75,7 +79,6 @@ class ProductItem extends StatelessWidget {
     );
   }
 
-
   void _confirmDelete(BuildContext context) {
     showDialog(
       context: context,
@@ -93,13 +96,32 @@ class ProductItem extends StatelessWidget {
             TextButton(
               child: const Text("Delete"),
               onPressed: () {
+                _deleteProduct(widget.product.id);
                 Navigator.of(context).pop();
-                onDelete(product.id);
+                setState(() {});
               },
             ),
           ],
         );
       },
     );
+  }
+
+  void _deleteProduct(String id)async{
+    Uri uri = Uri.parse( "http://164.68.107.70:6060/api/v1/DeleteProduct/$id");
+    Response response= await get(uri);
+    print(response.statusCode);
+    if(response.statusCode ==200){
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Success")));
+      setState(() {
+
+      });
+    }
+    else{
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Failed")));
+      setState(() {
+
+      });
+    }
   }
 }

@@ -11,6 +11,7 @@ class Myapp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: ProductListScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
